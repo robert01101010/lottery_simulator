@@ -6,11 +6,17 @@
                     Specify lottery range
                 </span>
                 <span v-if="!isRangeValid" class="coupon-generator__lottery-range--warning">
-                    Select correct numbers: for drawing (1 to 12) and lottery pool (1 to 99)
+                    Correct numbers: drawing (1 to 12) lottery pool (1 to 99) and (draw number <= pool)
                 </span>
-                <input type="number" v-model.number="createdNumberCount" class="coupon-generator__lottery-range--input">
+                <input type="number" v-model.number="createdNumberCount"
+                       :disabled="isRangeDeclarationEnabled"
+                       class="coupon-generator__lottery-range--input">
+
                 <span> from </span>
-                <input type="number" v-model.number="lotteryRange" class="coupon-generator__lottery-range--input">
+
+                <input type="number" v-model.number="lotteryRange"
+                       :disabled="isRangeDeclarationEnabled"
+                       class="coupon-generator__lottery-range--input">
             </div>
             <div class="coupon-generator__question">
                  <span v-if="!couponsToGenerateAmount">
@@ -37,7 +43,9 @@
                     <div class="coupons-generated-items__single-item">
                         Coupon number: {{number}}
                         <span class="coupons-generated-items__single-item--title">Generated numbers:</span>
-                        <div class="coupons-generated-items__single-item--numbers">{{ coupons[ number - 1 ] }}</div>
+                        <div class="coupons-generated-items__single-item--numbers">
+                            {{ getStringValueOfArr(coupons[ number - 1 ]) }}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -47,7 +55,7 @@
                         Check Coupons
                     </div>
                     <div v-if="checked" class="coupons-check__button--checked">
-                        Drawn numbers: {{ drawnNumbers }}
+                        Drawn numbers: {{ getStringValueOfArr(drawnNumbers) }}
                     </div>
                 </div>
             </div>
@@ -99,15 +107,23 @@
 
     computed: {
       isRangeValid () {
-        return this.isRangeToSmall && !this.isRangeOverstep && (this.lotteryRange >= this.createdNumberCount)
+        return this.isRangeToSmall && !this.isRangeOverstep && this.isRangeBiggestThanPool
+      },
+
+      isRangeBiggestThanPool () {
+        return this.lotteryRange >= this.createdNumberCount
       },
 
       isRangeToSmall () {
         return this.createdNumberCount > 0 && this.lotteryRange >= 0
       },
 
-      isRangeOverstep() {
+      isRangeOverstep () {
         return this.createdNumberCount > 12 || this.lotteryRange > 99
+      },
+
+      isRangeDeclarationEnabled () {
+        return this.coupons.length > 0
       }
     },
 
@@ -123,6 +139,10 @@
         for (let i = 0; i < this.couponsToGenerateAmount; i += 1) {
           this.coupons.push(this._getRandomNumbers(this.createdNumberCount, this.lotteryRange))
         }
+      },
+
+      getStringValueOfArr (arr) {
+        return arr.length ? arr.join(', ') : ''
       },
 
       checkCoupons () {
@@ -160,15 +180,15 @@
 
       getSameNumbersForCoupon (index) {
         if (this.numbersHit[ index ]) {
-          return this.numbersHit[ index ].sameNumbers
+          return this.getStringValueOfArr(this.numbersHit[ index ].sameNumbers)
         }
       },
 
       reset () {
         this.couponsToGenerateAmount = 0
-        this.coupons.length = 0
+        this.coupons = []
         this.checked = false
-        this.numbersHit.length = 0
+        this.numbersHit = []
       },
 
       _getRandomNumbers (numbersToCreate, range) {
@@ -194,12 +214,20 @@
     @base-background: #49667F;
     @contrast-to-base-background: #6E99BF;
     @highlighted-base-background: #84B8E5;
+    @warning-colors: darkred;
 
     // heights
     @standard-button-height: 40px;
     @double-standard-button-height: (@standard-button-height + @standard-button-height);
 
+    // widths
+    @max-width: 100%;
+    @base-width: 80%;
+    @eight-part-of-max-width: 12.5%;
+    @numeric-input-standard-width: 35px;
+
     // fonts
+    @native-font-size: 16px;
     @standard-font-size: 18px;
     @standard-font-weight: 500;
 
@@ -214,25 +242,31 @@
     //others
     @standard-hover-cursor: pointer;
     @standard-lighten-percentage: 10%;
+    @center-align: center;
 
     // Mixins
-    .displayFlexWithDirectionAndWrap(@direction, @wrap) {
+    .displayFlexWithDirectionAndWrap (@direction, @wrap) {
         display: flex;
         flex-direction: @direction;
         flex-wrap: @wrap;
     }
 
-    .quarterWidthWithPadding(@padding: padding) {
+    .quarterWidthWithPadding (@padding: padding) {
         width: calc(25% - (@padding + @padding));
         padding: @padding;
+    }
+
+    .nativeInputResetWithBackground (@background: background) {
+        border: none;
+        box-shadow: none;
+        background: @background;
     }
 
     // style
     .lottery-container {
         margin: 0 auto;
-        width: 60%;
+        width: @base-width;
         border: @standard-border;
-        opacity: 0.8;
         border-radius: @small-border-radius;
 
         .coupon-generator {
@@ -241,10 +275,14 @@
 
             &__lottery-range {
                 &--input {
-                    width: 35px;
+                    .nativeInputResetWithBackground(@contrast-to-base-background);
+                    text-align: @center-align;
+                    font-size: @native-font-size;
+                    width: @numeric-input-standard-width;
+                    border-radius: @small-border-radius;
                 }
                 &--warning {
-                    color: darkred;
+                    color: @warning-colors;
                 }
             }
 
@@ -253,8 +291,8 @@
                 font-weight: @standard-font-weight;
                 height: @standard-button-height;
                 line-height: @standard-button-height;
-                width: 100%;
-                text-align: center;
+                width: @max-width;
+                text-align: @center-align;
             }
 
             &__buttons {
@@ -263,9 +301,9 @@
                 line-height: @standard-button-height;
 
                 &--standard-item {
-                    text-align: center;
+                    text-align: @center-align;
                     border: @standard-border;
-                    width: 12.5%;
+                    width: @eight-part-of-max-width;
 
                     &:hover {
                         cursor: @standard-hover-cursor;
@@ -297,7 +335,7 @@
         }
 
         .coupons-check {
-            text-align: center;
+            text-align: @center-align;
             background: @base-background;
             height: @standard-button-height;
             line-height: @standard-button-height;
@@ -325,6 +363,7 @@
                 height: @double-standard-button-height;
 
                 .coupons-checked-items__single-item {
+                    padding: @small-padding;
                     border-radius: @small-border-radius;
                     border-bottom: @standard-border;
                     background: @contrast-to-base-background;
@@ -341,7 +380,7 @@
         }
 
         .lottery-reset {
-            text-align: center;
+            text-align: @center-align;
             background: @base-background;
             height: @standard-button-height;
             line-height: @standard-button-height;
