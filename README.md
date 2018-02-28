@@ -1,4 +1,5 @@
 ## Lottery Simulator
+recomended resolution >= 1024 x 768
 Simulator shows how hard is won in lottery games
 
 [Simple Live Demo](https://robert01101010.github.io/lottery_simulator/builded_for_github_host)
