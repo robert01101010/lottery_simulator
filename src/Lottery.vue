@@ -3,16 +3,22 @@
         <div class="coupon-generator">
             <div class="coupon-generator__lottery-range">
                 <span v-if="isRangeValid">
-                    Specify lottery range
+                    How many numbers on coupon
                 </span>
                 <span v-if="!isRangeValid" class="coupon-generator__lottery-range--warning">
                     Correct numbers: drawing (1 to 12) lottery pool (1 to 99) and (draw number <= pool)
                 </span>
-                <input type="number" v-model.number="createdNumberCount"
+                <input type="number" v-model.number="numbersOnCouponsAmount"
+                       :disabled="isRangeDeclarationEnabled"
+                       class="coupon-generator__lottery-range--input">
+                <span>
+                    how much to draw
+                </span>
+                <input type="number" v-model.number="numbersToDrawnAmount"
                        :disabled="isRangeDeclarationEnabled"
                        class="coupon-generator__lottery-range--input">
 
-                <span> from </span>
+                <span> total pool </span>
 
                 <input type="number" v-model.number="lotteryRange"
                        :disabled="isRangeDeclarationEnabled"
@@ -99,27 +105,31 @@
         couponsToGenerateAmount: 0,
         coupons: [],
         lotteryRange: 49,
-        createdNumberCount: 6,
+        numbersToDrawnAmount: 8,
+        numbersOnCouponsAmount: 6,
         checked: false,
-        numbersHit: []
+        numbersHit: [],
+        maxNumberOnCoupon: 12,
+        maxLotteryPool: 80,
+        maxNumbersToDraw: 30
       }
     },
 
     computed: {
       isRangeValid () {
-        return this.isRangeToSmall && !this.isRangeOverstep && this.isRangeBiggestThanPool
+        return this.isRangeToSmall && !this.isRangeOverstep && this.isRangedSizeValid
       },
 
-      isRangeBiggestThanPool () {
-        return this.lotteryRange >= this.createdNumberCount
+      isRangedSizeValid () {
+        return this.lotteryRange >= this.numbersOnCouponsAmount && this.numbersToDrawnAmount < this.lotteryRange
       },
 
       isRangeToSmall () {
-        return this.createdNumberCount > 0 && this.lotteryRange >= 0
+        return this.numbersOnCouponsAmount > 0 && this.lotteryRange >= 0 && this.numbersToDrawnAmount > 0
       },
 
       isRangeOverstep () {
-        return this.createdNumberCount > 12 || this.lotteryRange > 99
+        return this.numbersOnCouponsAmount > this.maxNumberOnCoupon || this.lotteryRange > this.maxLotteryPool || this.numbersToDrawnAmount > this.maxNumbersToDraw
       },
 
       isRangeDeclarationEnabled () {
@@ -137,7 +147,7 @@
 
       generateNumbers () {
         for (let i = 0; i < this.couponsToGenerateAmount; i += 1) {
-          this.coupons.push(this._getRandomNumbers(this.createdNumberCount, this.lotteryRange))
+          this.coupons.push(this._getRandomNumbers(this.numbersOnCouponsAmount, this.lotteryRange))
         }
       },
 
@@ -151,7 +161,7 @@
       },
 
       createDraw () {
-        this.drawnNumbers = this._getRandomNumbers(this.createdNumberCount, this.lotteryRange)
+        this.drawnNumbers = this._getRandomNumbers(this.numbersToDrawnAmount, this.lotteryRange)
 
         this.coupons.forEach((coupon) => {
           this.numbersHit.push(this.getSameNumbers(this.drawnNumbers, coupon))
