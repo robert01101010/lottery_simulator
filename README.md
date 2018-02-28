@@ -1,7 +1,7 @@
 ## Lottery Simulator
 Simulator shows how hard is won in lottery games
 
-[Simple Live Demo](https://robert01101010.github.io/memory_game/indexDemo.html)
+[Simple Live Demo](https://robert01101010.github.io/builded_for_github_host)
 
 ## Setup
 ``` bash
