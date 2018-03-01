@@ -175,7 +175,7 @@
         let sameNumbers = []
 
         arrayToCompare.forEach((number) => {
-          if (drawnNumbers.indexOf(number) !== -1) {
+          if (drawnNumbers.includes(number)) {
             sameNumbers.push(number)
           }
         })
@@ -209,7 +209,7 @@
         for (let i = 0; i < numbersToCreate; i += 1) {
 
           const randomNumber = Math.round(Math.random() * (range - 1) + 1)
-          if (numbers.indexOf(randomNumber) === -1) {
+          if (!numbers.includes(randomNumber)) {
             numbers.push(randomNumber)
           } else {
             i -= 1
