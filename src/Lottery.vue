@@ -2,27 +2,30 @@
     <div class="lottery-container">
         <div class="coupon-generator">
             <div class="coupon-generator__lottery-range">
-                <span v-if="isRangeValid">
-                    How many numbers on coupon
-                </span>
-                <span v-if="!isRangeValid" class="coupon-generator__lottery-range--warning">
-                    Correct numbers: drawing (1 to 12) lottery pool (1 to 99) and (draw number <= pool)
+                <span>
+                    How many numbers on coupon:
                 </span>
                 <input type="number" v-model.number="numbersOnCouponsAmount"
                        :disabled="isRangeDeclarationEnabled"
                        class="coupon-generator__lottery-range--input">
                 <span>
-                    how much to draw
+                    how much to draw:
                 </span>
                 <input type="number" v-model.number="numbersToDrawnAmount"
                        :disabled="isRangeDeclarationEnabled"
                        class="coupon-generator__lottery-range--input">
-
-                <span> total pool </span>
-
+                <span>
+                    total pool:
+                </span>
                 <input type="number" v-model.number="lotteryRange"
                        :disabled="isRangeDeclarationEnabled"
                        class="coupon-generator__lottery-range--input">
+            </div>
+            <div class="coupon-generator__lottery-range" v-if="!isRangeValid">
+                 <span class="coupon-generator__lottery-range--warning">
+                    Correct numbers! Number on coupons (1 to 12), for draw (1 to 30)
+                     lottery pool (1 to 99) and (number on coupons <= pool)
+                 </span>
             </div>
             <div class="coupon-generator__question">
                  <span v-if="!couponsToGenerateAmount">
@@ -110,7 +113,7 @@
         checked: false,
         numbersHit: [],
         maxNumberOnCoupon: 12,
-        maxLotteryPool: 80,
+        maxLotteryPool: 99,
         maxNumbersToDraw: 30
       }
     },
@@ -221,7 +224,7 @@
 
 <style lang="less" scoped>
     // colors
-    @base-background: #49667F;
+    @base-background: #5D809E;
     @contrast-to-base-background: #6E99BF;
     @highlighted-base-background: #84B8E5;
     @warning-colors: darkred;
